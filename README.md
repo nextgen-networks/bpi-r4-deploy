@@ -346,7 +346,20 @@ Fork this repository on GitHub. **Do not rename the fork** — it must stay name
    - **wired** — builds all wired variants (4GB + 8GB, standard + PoE + UniFi) → 6 releases.
 4. After the workflow finishes (~2 hours), releases will be created in your fork.
 
-### Step 5 — Install from your fork
+### Step 5 — Advanced Customization (Optional)
+
+When triggering the workflow manually (**Run workflow**), you can provide additional inputs for advanced customization without modifying any files:
+
+| Input | Purpose | Example |
+|---|---|---|
+| **Extra feeds** | Add new source repositories to `feeds.conf.default` | `src-git custom https://github.com/example/packages.git` |
+| **Extra configs** | Add entries to `.config` (enable packages) | `CONFIG_PACKAGE_luci-app-test=y` |
+| **Extra APK keys** | Inject trusted signing keys for APK updates | `mykey.pub:` <br> `-----BEGIN PUBLIC KEY-----` <br> `...` <br> `-----END PUBLIC KEY-----` |
+| **Extra APK repositories** | Add runtime APK repository URLs | `https://dl.eko.one.pl/packages/apk/all/` |
+
+> **Note on Extra APK keys**: To provide multiple keys, use the format `filename:` on a new line followed by the key data. If no `filename:` is found, the input is saved as `extra.pub`.
+
+### Step 6 — Install from your fork
 
 When running `install-nvme.sh` or `install-emmc.sh`, select option **[2] My fork** and enter your GitHub username.
 
