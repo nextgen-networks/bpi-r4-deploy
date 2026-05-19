@@ -17,8 +17,15 @@ case "$MODE" in
     "feeds")
         if is_valid "${USER_EXTRA_FEEDS:-}"; then
             echo "Applying extra feeds..."
-            echo "" >> feeds.conf.default
-            echo "$USER_EXTRA_FEEDS" >> feeds.conf.default
+            # Ensure file ends with a newline before appending
+            [ -f feeds.conf.default ] && sed -i '$a\' feeds.conf.default
+
+            while IFS= read -r line; do
+                # Only append lines that look like a feed source
+                if echo "$line" | grep -qE "^src-"; then
+                    echo "$line" >> feeds.conf.default
+                fi
+            done <<< "$USER_EXTRA_FEEDS"
         fi
         ;;
 
@@ -39,6 +46,7 @@ case "$MODE" in
                     fi
                 done <<< "$USER_EXTRA_APK_KEYS"
             else
+                # Fallback: if no multi-key format detected, save everything as extra.pub
                 echo "$USER_EXTRA_APK_KEYS" > files/etc/apk/keys/extra.pub
             fi
         fi
@@ -51,6 +59,8 @@ case "$MODE" in
             cat > files/etc/uci-defaults/99-extra-apk-repositories << 'EOF'
 #!/bin/sh
 if [ -f /etc/apk/repositories.extra ]; then
+    # Ensure file ends with a newline before appending
+    sed -i '$a\' /etc/apk/repositories
     cat /etc/apk/repositories.extra >> /etc/apk/repositories
     rm /etc/apk/repositories.extra
 fi
@@ -62,8 +72,15 @@ EOF
     "configs")
         if is_valid "${USER_EXTRA_CONFIGS:-}"; then
             echo "Applying extra configs..."
-            echo "" >> .config
-            echo "$USER_EXTRA_CONFIGS" >> .config
+            # Ensure file ends with a newline before appending
+            [ -f .config ] && sed -i '$a\' .config
+
+            while IFS= read -r line; do
+                # Only append lines that look like a config entry
+                if echo "$line" | grep -qE "^CONFIG_|^# CONFIG_"; then
+                    echo "$line" >> .config
+                fi
+            done <<< "$USER_EXTRA_CONFIGS"
         fi
         ;;
 esac
