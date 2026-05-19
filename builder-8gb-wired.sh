@@ -38,6 +38,39 @@ mkdir -p files/etc/uci-defaults
 \cp -r ../my_files/99-set-hostname files/etc/uci-defaults/
 chmod +x files/etc/uci-defaults/99-set-hostname
 
+# Handle extra APK keys
+if [ -n "${EXTRA_APK_KEYS:-}" ]; then
+    mkdir -p files/etc/apk/keys
+    if echo "$EXTRA_APK_KEYS" | grep -q ':$'; then
+        current_file=""
+        while IFS= read -r line; do
+            if echo "$line" | grep -q '^[^ ]*: *$'; then
+                keyname=$(echo "$line" | sed 's/: *$//')
+                current_file="files/etc/apk/keys/$keyname"
+                : > "$current_file"
+            elif [ -n "$current_file" ]; then
+                echo "$line" >> "$current_file"
+            fi
+        done <<< "$EXTRA_APK_KEYS"
+    else
+        echo "$EXTRA_APK_KEYS" > files/etc/apk/keys/extra.pub
+    fi
+fi
+
+# Handle extra APK repositories
+if [ -n "${EXTRA_APK_REPOSITORIES:-}" ]; then
+    mkdir -p files/etc/uci-defaults
+    echo "$EXTRA_APK_REPOSITORIES" > files/etc/apk/repositories.extra
+    cat > files/etc/uci-defaults/99-extra-apk-repositories << 'EOF'
+#!/bin/sh
+if [ -f /etc/apk/repositories.extra ]; then
+    cat /etc/apk/repositories.extra >> /etc/apk/repositories
+    rm /etc/apk/repositories.extra
+fi
+EOF
+    chmod +x files/etc/uci-defaults/99-extra-apk-repositories
+fi
+
 [ -n "${EXTRA_FEEDS:-}" ] && echo "$EXTRA_FEEDS" >> feeds.conf.default
 ./scripts/feeds update -a
 ./scripts/feeds install -a
