@@ -43,6 +43,7 @@ mkdir -p files/etc/uci-defaults
 \cp -r ../my_files/99-set-hostname files/etc/uci-defaults/
 chmod +x files/etc/uci-defaults/99-set-hostname
 
+[ -n "${EXTRA_FEEDS:-}" ] && echo "$EXTRA_FEEDS" >> feeds.conf.default
 ./scripts/feeds update -a
 ./scripts/feeds install -a
 
@@ -55,6 +56,7 @@ chmod -R 755 feeds/luci/applications/luci-app-sms-tool-js/root
 chmod -R 755 feeds/packages/utils/modemdata/files/usr/share
 
 \cp -r ../configs/my_defconfig-8gb-standard .config
+[ -n "${EXTRA_CONFIGS:-}" ] && echo "$EXTRA_CONFIGS" >> .config
 make defconfig
 
 echo "CONFIG_PACKAGE_trusted-firmware-a-mt7988-emmc-comb-4bg=y" >> .config

@@ -15,6 +15,16 @@ on:
         description: 'Commit hash of this repository (leave empty for latest)'
         required: false
         default: ''
+      extra_feeds:
+        description: 'Extra feeds (feeds.conf.default)'
+        required: false
+        default: ''
+        type: string
+      extra_configs:
+        description: 'Extra configs (.config)'
+        required: false
+        default: ''
+        type: string
 
 permissions:
   contents: write
@@ -128,6 +138,8 @@ jobs:
         env:
           OPENWRT_COMMIT: ${{ env.OPENWRT_COMMIT }}
           MTK_COMMIT: ${{ env.MTK_COMMIT }}
+          EXTRA_FEEDS: ${{ github.event.inputs.extra_feeds }}
+          EXTRA_CONFIGS: ${{ github.event.inputs.extra_configs }}
 
       - name: Prepare release artifacts
         run: |
