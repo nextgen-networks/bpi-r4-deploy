@@ -45,41 +45,9 @@ echo "CONFIG_BLK_DEV_NVME=y" >> target/linux/mediatek/filogic/config-6.12
 mkdir -p files/etc/uci-defaults
 \cp -r ../my_files/99-set-hostname files/etc/uci-defaults/
 chmod +x files/etc/uci-defaults/99-set-hostname
+bash ../my_files/apply-custom-sources.sh keys
 
-# Handle extra APK keys
-if [ -n "${EXTRA_APK_KEYS:-}" ]; then
-    mkdir -p files/etc/apk/keys
-    if echo "$EXTRA_APK_KEYS" | grep -q ':$'; then
-        current_file=""
-        while IFS= read -r line; do
-            if echo "$line" | grep -q '^[^ ]*: *$'; then
-                keyname=$(echo "$line" | sed 's/: *$//')
-                current_file="files/etc/apk/keys/$keyname"
-                : > "$current_file"
-            elif [ -n "$current_file" ]; then
-                echo "$line" >> "$current_file"
-            fi
-        done <<< "$EXTRA_APK_KEYS"
-    else
-        echo "$EXTRA_APK_KEYS" > files/etc/apk/keys/extra.pub
-    fi
-fi
-
-# Handle extra APK repositories
-if [ -n "${EXTRA_APK_REPOSITORIES:-}" ]; then
-    mkdir -p files/etc/uci-defaults
-    echo "$EXTRA_APK_REPOSITORIES" > files/etc/apk/repositories.extra
-    cat > files/etc/uci-defaults/99-extra-apk-repositories << 'EOF'
-#!/bin/sh
-if [ -f /etc/apk/repositories.extra ]; then
-    cat /etc/apk/repositories.extra >> /etc/apk/repositories
-    rm /etc/apk/repositories.extra
-fi
-EOF
-    chmod +x files/etc/uci-defaults/99-extra-apk-repositories
-fi
-
-[ -n "${EXTRA_FEEDS:-}" ] && echo "$EXTRA_FEEDS" >> feeds.conf.default
+bash ../my_files/apply-custom-sources.sh feeds
 ./scripts/feeds update -a
 ./scripts/feeds install -a
 
@@ -92,7 +60,8 @@ chmod -R 755 feeds/luci/applications/luci-app-sms-tool-js/root
 chmod -R 755 feeds/packages/utils/modemdata/files/usr/share
 
 \cp -r ../configs/my_defconfig-standard .config
-[ -n "${EXTRA_CONFIGS:-}" ] && echo "$EXTRA_CONFIGS" >> .config
+make defconfig
+bash ../my_files/apply-custom-sources.sh configs
 make defconfig
 
 mkdir -p staging_dir/target-aarch64_cortex-a53_musl/image/

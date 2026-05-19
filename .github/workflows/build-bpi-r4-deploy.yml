@@ -148,10 +148,10 @@ jobs:
         env:
           OPENWRT_COMMIT: ${{ env.OPENWRT_COMMIT }}
           MTK_COMMIT: ${{ env.MTK_COMMIT }}
-          EXTRA_FEEDS: ${{ github.event.inputs.extra_feeds }}
-          EXTRA_CONFIGS: ${{ github.event.inputs.extra_configs }}
-          EXTRA_APK_KEYS: ${{ github.event.inputs.extra_apk_keys }}
-          EXTRA_APK_REPOSITORIES: ${{ github.event.inputs.extra_apk_repositories }}
+          USER_EXTRA_FEEDS: ${{ github.event.inputs.extra_feeds }}
+          USER_EXTRA_CONFIGS: ${{ github.event.inputs.extra_configs }}
+          USER_EXTRA_APK_KEYS: ${{ github.event.inputs.extra_apk_keys }}
+          USER_EXTRA_APK_REPOSITORIES: ${{ github.event.inputs.extra_apk_repositories }}
 
       - name: Prepare release artifacts
         run: |
