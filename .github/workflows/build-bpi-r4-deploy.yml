@@ -18,22 +18,18 @@ on:
       extra_feeds:
         description: 'Extra feeds (feeds.conf.default)'
         required: false
-        default: ''
         type: string
       extra_apk_keys:
         description: 'Extra APK keys (format: keyname:keydata)'
         required: false
-        default: ''
         type: string
       extra_apk_repositories:
         description: 'Extra APK repositories'
         required: false
-        default: ''
         type: string
       extra_configs:
         description: 'Extra configs (.config)'
         required: false
-        default: ''
         type: string
 
 permissions:
