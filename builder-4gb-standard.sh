@@ -38,7 +38,9 @@ echo "CONFIG_BLK_DEV_NVME=y" >> target/linux/mediatek/filogic/config-6.12
 mkdir -p files/etc/uci-defaults
 \cp -r ../my_files/99-set-hostname files/etc/uci-defaults/
 chmod +x files/etc/uci-defaults/99-set-hostname
+bash ../my_files/apply-custom-sources.sh keys
 
+bash ../my_files/apply-custom-sources.sh feeds
 ./scripts/feeds update -a
 ./scripts/feeds install -a
 
@@ -51,6 +53,8 @@ chmod -R 755 feeds/luci/applications/luci-app-sms-tool-js/root
 chmod -R 755 feeds/packages/utils/modemdata/files/usr/share
 
 \cp -r ../configs/my_defconfig-4gb-standard .config
+make defconfig
+bash ../my_files/apply-custom-sources.sh configs
 make defconfig
 
 bash ../mtk-openwrt-feeds/autobuild/unified/autobuild.sh filogic-mac80211-mt798x_rfb-wifi7_nic build
